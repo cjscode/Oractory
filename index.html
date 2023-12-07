@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oractory</title>
+    <style>
+        #game{
+            position: absolute;
+            background-color: rgb(15, 15, 15);
+            margin: 0;
+            z-index: 1;
+        }
+        html,body,head{
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+        }
+        #overlay {
+            position: absolute;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+        }
+        #ng, #lgsave, #lgfile, #settings {
+            background-color: rgb(60,60,60);
+            width: 22.5vmin;
+            height: 7vmin;
+            border-radius: 2vmin;
+            position: absolute;
+            border: none;
+            color: rgb(240, 240, 240);
+            font-size: 4vmin;
+            padding: 0;
+            translate: -50% 0;
+            left: 50%;
+            z-index: 2;
+        }
+        #ng {
+            top: 50%;
+        }
+        #lgsave {
+            top: calc(50% + 9.5vmin);
+        }
+        #lgfile {
+            top: calc(50% + 19vmin);
+        }
+        #settings {
+            top: calc(50% + 28.5vmin);
+        }
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+            font-family: monospace;
+        }
+        .toggle {
+            height: 3vmin;
+            top: 1.5vmin;
+            z-index: 3;
+            padding: 0;
+            margin: 0;
+            position: absolute;
+        }
+        #menutitle {
+            font-size: 15vmin;
+            position: absolute;
+            color: rgb(240,240,240);
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            translate: -50% calc(-100% - 2.5vmin);
+            padding: 0;
+            margin: 0;
+        }
+        #loadfile {
+            display: none;
+        }
+        #loading {
+            color: rgb(240,240,240);
+            font-size: 4vmin;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            padding: 0;
+            margin: 0;
+            translate: -50% 2.5vmin;
+        }
+        #gamebar {
+            position: absolute;
+            top: calc(100% - 1vmin);
+            left: 50%;
+            width: 98vmin;
+            translate: -50% -100%;
+            background-color: rgb(60,60,60);
+            border-radius: 2.5vmin;
+            height: 11vmin;
+        }
+        .gbitem {
+            position: absolute;
+            top: 1vmin;
+            left: 1vmin;
+            width: 9vmin;
+            height: 9vmin;
+            background-color: rgb(40,40,40);
+            border-radius: 2.5vmin;
+        }
+        #stats {
+            position: absolute;
+        }
+        .statitem {
+            color: rgb(240,240,240);
+            float: left;
+            width: 100%;
+            font-size: 3vmin;
+            z-index: -1;
+        }
+        #fps {
+            color: rgb(240,240,240);
+            text-align: right;
+            width: 100%;
+            position: absolute;
+            font-size: 2vmin;
+        }
+        </style>
+</head>
+<body>
+    <input id="loadfile" hidden type="file" accept=".json">
+    <div id="overlay">
+        <p id="menutitle">ORACTORY</p>
+        <span id="buttons">
+            <button id="ng" data-show="home">New Game</button>
+            <button id="lgsave" data-show="home">Load Save</button>
+            <button id="lgfile" data-show="home" onclick="document.querySelector('#loadfile').click()">Load File</button>
+            <button id="settings" data-show="home">Settings</button>
+        </span>
+        <p id="loading" data-show="loading">Loading...</p>
+        <div id="gamebar">
+            <span class="gbitem">ITEM</span>
+        </div>
+        <span id="stats">
+            <span class="statitem">Money: $$$</span>
+            <span class="statitem">Money: $$$</span>
+            <span class="statitem">Money: $$$</span>
+            <span class="statitem">Money: $$$</span>
+            <span class="statitem">Money: $$$</span>
+        </span>
+        <span id="fps">60</span>
+        <div id="unlockers">
+        </div>
+    </div>
+    <canvas id="game"></canvas>
+    <script src="game.js"></script>
+</body>xw
+</html>
