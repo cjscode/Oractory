@@ -14,17 +14,28 @@ let tiles = [
     "Iridium",
     "Adamantine"
 ]
+let buildings = [
+    {
+        name: "Main Base",
+        id: "MainBase"
+    }
+]
 let tilechance = []
 tiles.forEach((v, x) => {
     let i = new Image()
     i.src = `img/${v}.png`
-    imgs[x] = i
+    imgs.push(i)
     if (x == 0) {
         x = -3
     }
     for (i = 0; i < Math.pow(2, tiles.length - x - 1); i++) {
         tilechance.push(v)
     }
+})
+buildings.forEach((v,x) => {
+    let i = new Image()
+    i.src = `img/${v.id}.png`
+    imgs.push(i)
 })
 let ng = {
     wave: 1,
@@ -58,6 +69,7 @@ async function newgame() {
             d: tiles.indexOf(tilechance[Math.floor(tilechance.length * Math.random())])
         })
     }
+    ng.data[Math.floor(Math.random()*ng.data.length)].d = 1
     setTimeout(() => {
         ngat = "Finishing Up"
     },250)
@@ -107,46 +119,66 @@ for (let i = 0; i < 200; i++) {
     starspd[i] = Math.random() / 5
 }
 document.ontouchstart = function (e) {
-    if (!(screen == "game")) { return }
+    e = e.touches[0]
+    if (!(screen == "game") || e.clientY >= document.body.clientHeight-Math.min(document.body.clientWidth,document.body.clientHeight)*0.11) { return }
     bx = x
     by = y
-    e = e.touches[0]
     dx = e.clientX
     dy = e.clientY
 }
 document.ontouchmove = function (e) {
-    if (!(screen == "game")) { return }
     e = e.touches[0]
+    if (!(screen == "game") || e.clientY >= document.body.clientHeight-Math.min(document.body.clientWidth,document.body.clientHeight)*0.11) { return }
     x = e.clientX - dx + bx
     y = e.clientY - dy + by
 }
 document.onclick = function (e) {
-    if (!(screen == "game")) { return }
+    if (!(screen == "game") || e.clientY >= document.body.clientHeight-Math.min(document.body.clientWidth,document.body.clientHeight)*0.11) { return }
     handleClick(e)
 }
 let frame = 0
 let fps = 60
 let lloop = new Date()
 document.onkeyup = (e) => {
+    if (!(screen == "game")) { return }
     if (e.key == "i") {
-        zoom = (zoom <= 0.5 ? zoom : zoom - 0.5)
+        zoom = (zoom <= 0.5 ? 0.5 : zoom - 0.5)
     } else if (e.key == "o") {
-        zoom = (zoom >= 10 ? zoom : zoom + 0.5) 
+        zoom = (zoom >= 10 ? 10 : zoom + 0.5) 
     } else if (e.key == "e") {
         expand()
+    } else if (e.key == "r") {
+        zoom = 1
+        x = 0
+        y = 0
     }
 }
+document.querySelector("#zoomin").addEventListener("click",() => {
+    zoom = (zoom <= 0.5 ? 0.5 : zoom - 0.5)
+    x = -250*Math.pow(zoom,-1)+250//-x
+    y = -250*Math.pow(zoom,-1)+250//-y
+})
+document.querySelector("#zoomout").addEventListener("click",() => {
+    zoom = (zoom >= 10 ? 10 : zoom + 0.5)
+    x = -250*Math.pow(zoom,-1)+250//-x
+    y = -250*Math.pow(zoom,-1)+250//-y
+})
+document.querySelector("#reset").addEventListener("click",() => {
+    zoom = 1
+    x = 0
+    y = 0
+})
 function render() {
     let tloop = new Date()
     fps = 1000/(tloop-lloop)
     lloop = tloop
-    //move boundaries that dont work
-    /*x = (x < ((ng.exp-1)*500+250)*zoom ? ((ng.exp-1)*500+250)*zoom : x)
+    /*move boundaries that dont work
+    x = (x < ((ng.exp-1)*500+250)*zoom ? ((ng.exp-1)*500+250)*zoom : x)
     x = (x > -((ng.exp-1)*500+250)*zoom ? -((ng.exp-1)*500+250)*zoom : x)
     y = (y < ((ng.exp-1)*500+250)*zoom ? ((ng.exp-1)*500+250)*zoom : y)
     y = (y > -((ng.exp-1)*500+250)*zoom ? -((ng.exp-1)*500+250)*zoom : y)
     */
-    document.querySelector("#fps").innerHTML = Math.floor(fps)
+    document.querySelector("#fps").innerHTML = Math.floor(fps)+" - x:"+x+" y:"+y//+(document.body.clientWidth/2-((5 * 50/zoom)+x-250+document.body.clientWidth/2))+" y:"+(document.body.clientHeight/2-((5 * 50/zoom)+y-250+document.body.clientHeight/2))
     canv.width = document.body.clientWidth
     canv.height = document.body.clientHeight
     canv.style.width = document.body.clientWidth+"px"
