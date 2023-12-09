@@ -113,22 +113,25 @@ let by = 0
 let starx = []
 let stary = []
 let starspd = []
+let down = false
 for (let i = 0; i < 200; i++) {
     starx[i] = Math.random()
     stary[i] = Math.random()
     starspd[i] = Math.random() / 5
 }
-document.ontouchstart = function (e) {
-    e = e.touches[0]
+document.onmousedown = function (e) {
     if (!(screen == "game") || e.clientY >= document.body.clientHeight-Math.min(document.body.clientWidth,document.body.clientHeight)*0.11) { return }
     bx = x
     by = y
     dx = e.clientX
     dy = e.clientY
+    down = true
 }
-document.ontouchmove = function (e) {
-    e = e.touches[0]
-    if (!(screen == "game") || e.clientY >= document.body.clientHeight-Math.min(document.body.clientWidth,document.body.clientHeight)*0.11) { return }
+document.onmouseup = function () {
+    down = false
+}
+document.onmousemove = function (e) {
+    if (!(screen == "game") || e.clientY >= document.body.clientHeight-Math.min(document.body.clientWidth,document.body.clientHeight)*0.11 || !(down)) { return }
     x = e.clientX - dx + bx
     y = e.clientY - dy + by
 }
@@ -136,15 +139,33 @@ document.onclick = function (e) {
     if (!(screen == "game") || e.clientY >= document.body.clientHeight-Math.min(document.body.clientWidth,document.body.clientHeight)*0.11) { return }
     handleClick(e)
 }
+function zoomin () {
+    zoom = (zoom <= 0.5 ? 0.5 : zoom - 0.5)
+    x = -250*Math.pow(zoom,-1)+250//-x
+    y = -250*Math.pow(zoom,-1)+250//-y
+}
+function zoomout () {
+    zoom = (zoom >= 10 ? 10 : zoom + 0.5)
+    x = -250*Math.pow(zoom,-1)+250//-x
+    y = -250*Math.pow(zoom,-1)+250//-y
+}
+document.onwheel = function (e) {
+    if (!(screen == "game")) { return }
+    if (e.deltaY == -100) {
+        zoomin()
+    } else if (e.deltaY == 100) {
+        zoomout()
+    }
+}
 let frame = 0
 let fps = 60
 let lloop = new Date()
 document.onkeyup = (e) => {
     if (!(screen == "game")) { return }
     if (e.key == "i") {
-        zoom = (zoom <= 0.5 ? 0.5 : zoom - 0.5)
+        zoomin()
     } else if (e.key == "o") {
-        zoom = (zoom >= 10 ? 10 : zoom + 0.5) 
+        zoomout()
     } else if (e.key == "e") {
         expand()
     } else if (e.key == "r") {
@@ -154,14 +175,10 @@ document.onkeyup = (e) => {
     }
 }
 document.querySelector("#zoomin").addEventListener("click",() => {
-    zoom = (zoom <= 0.5 ? 0.5 : zoom - 0.5)
-    x = -250*Math.pow(zoom,-1)+250//-x
-    y = -250*Math.pow(zoom,-1)+250//-y
+    zoomin()
 })
 document.querySelector("#zoomout").addEventListener("click",() => {
-    zoom = (zoom >= 10 ? 10 : zoom + 0.5)
-    x = -250*Math.pow(zoom,-1)+250//-x
-    y = -250*Math.pow(zoom,-1)+250//-y
+    zoomout()
 })
 document.querySelector("#reset").addEventListener("click",() => {
     zoom = 1
