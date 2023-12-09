@@ -3,6 +3,8 @@ let ctx = canv.getContext("2d")
 let screen = "home"
 let imgs = []
 let zoom = 1
+let version = "v1.0.4"
+document.querySelector("#version").innerHTML = version
 let tiles = [
     "Air",
     "Stone",
@@ -17,7 +19,7 @@ let tiles = [
 let buildings = [
     {
         name: "Main Base",
-        id: "MainBase"
+        id: "HomeBase"
     }
 ]
 let tilechance = []
@@ -97,7 +99,8 @@ if (ctx == null) {
     alert("Your browser does not support this game. Please upgrade your browser to continue.")
 }
 window.addEventListener("error", function (e) {
-    alert(`Error occured: ${e.error} at #${e.lineno} in ${e.filename}`)
+    document.querySelector("#error").innerHTML = `Error occured: ${e.error} at #${e.lineno} in ${e.filename} - version: ${version}`
+    document.querySelector("#error").display = "block"
 })
 function handleClick(e) {
 
@@ -140,14 +143,20 @@ document.onclick = function (e) {
     handleClick(e)
 }
 function zoomin () {
+    if (zoom <= 0.5) {
+        return
+    }
     zoom = (zoom <= 0.5 ? 0.5 : zoom - 0.5)
-    x = -250*Math.pow(zoom,-1)+250//-x
-    y = -250*Math.pow(zoom,-1)+250//-y
+    x = -250*Math.pow(zoom,-1)+250+x/zoom
+    y = -250*Math.pow(zoom,-1)+250+y/zoom
 }
 function zoomout () {
+    if (zoom >= 10) {
+        return
+    }
     zoom = (zoom >= 10 ? 10 : zoom + 0.5)
-    x = -250*Math.pow(zoom,-1)+250//-x
-    y = -250*Math.pow(zoom,-1)+250//-y
+    x = -250*Math.pow(zoom,-1)+250+x*zoom
+    y = -250*Math.pow(zoom,-1)+250+y*zoom
 }
 document.onwheel = function (e) {
     if (!(screen == "game")) { return }
