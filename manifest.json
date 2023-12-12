@@ -10,5 +10,7 @@
     ],
     "orientation":"landscape",
     "theme_color":"rgb(15,15,15)",
-    "display":"fullscreen"
+    "display":"fullscreen",
+    "start_url":"https://oractory.vercel.app",
+    "scope":"https://oractory.vercel.app"
 }

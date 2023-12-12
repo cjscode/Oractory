@@ -3,7 +3,7 @@ let ctx = canv.getContext("2d")
 let screen = "home"
 let imgs = []
 let zoom = 1
-let version = "v1.0.6"
+let version = "v1.0.7"
 document.querySelector("#version").innerHTML = version
 const tiles = [
     "Air",
