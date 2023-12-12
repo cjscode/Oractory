@@ -3,9 +3,9 @@ let ctx = canv.getContext("2d")
 let screen = "home"
 let imgs = []
 let zoom = 1
-let version = "v1.0.5"
+let version = "v1.0.6"
 document.querySelector("#version").innerHTML = version
-let tiles = [
+const tiles = [
     "Air",
     "Stone",
     "Iron",
@@ -16,10 +16,42 @@ let tiles = [
     "Iridium",
     "Adamantine"
 ]
-let buildings = [
+const buildings = [
     {
-        name: "Main Base",
+        name: "Home Base",
         id: "HomeBase"
+    },
+    {
+        name: "Stone Mine",
+        id: "StoneMine"
+    },
+    {
+        name: "Iron Mine",
+        id: "IronMine"
+    },
+    {
+        name: "Gold Mine",
+        id: "GoldMine"
+    },
+    {
+        name: "Ruby Mine",
+        id: "RubyMine"
+    },
+    {
+        name: "Diamond Mine",
+        id: "DiamondMine"
+    },
+    {
+        name: "Uranium Mine",
+        id: "UraniumMine"
+    },
+    {
+        name: "Iridium Mine",
+        id: "IridiumMine"
+    },
+    {
+        name: "Adamantine Mine",
+        id: "AdamantineMine"
     }
 ]
 let tilechance = []
@@ -42,15 +74,16 @@ buildings.forEach((v,x) => {
 let ng = {
     wave: 1,
     data: [],
-    exp: 0
+    exp: 0,
+    bdata: []
 }
 let ngat = ""
 function expand () {
     ng.exp++
-    let g = (ng.exp*2+1)*(ng.exp*2+1)
+    const g = (ng.exp*2+1)*(ng.exp*2+1)
     for (let m = 0; m < g; m++) {
-        let cx = ng.exp-(m%Math.sqrt(g))
-        let cy = ng.exp-(Math.floor(m/Math.sqrt(g)))
+        const cx = ng.exp-(m%Math.sqrt(g))
+        const cy = ng.exp-(Math.floor(m/Math.sqrt(g)))
         if (cx == 0-ng.exp || cx == ng.exp || cy == 0-ng.exp || cy == ng.exp) {
             for (let i = 0; i < 100; i++) {
                 ng.data.push({
@@ -190,33 +223,67 @@ document.querySelector("#zoomin").addEventListener("click",() => {
 document.querySelector("#zoomout").addEventListener("click",() => {
     zoomout()
 })
+document.querySelector("#zoomin2").addEventListener("click",() => {
+    zoomin()
+})
+document.querySelector("#zoomout2").addEventListener("click",() => {
+    zoomout()
+})
 document.querySelector("#reset").addEventListener("click",() => {
+    zoom = 1
+    x = 0
+    y = 0
+})
+document.querySelector("#reset2").addEventListener("click",() => {
     zoom = 1
     x = 0
     y = 0
 })
 let selectedbuilding = null
 function beginbuilding (b) {
-    let index = buildings.findIndex(item => item.id == b)
+    if (building) { return }
+    const index = buildings.findIndex(item => item.id == b)
+    selectedbuilding = index
+    document.querySelector("#selectedb").src = `img/${b}.png`
     building = true
-    alert(index)
-    document.addEventListener("click",(e)=>{
+    let ev = document.addEventListener("click",(e)=>{
         if (!(building)) {
             return
         }
         if (!(screen == "game") || e.clientY >= document.body.clientHeight-Math.min(document.body.clientWidth,document.body.clientHeight)*0.11) { return }
-        let bx = Math.floor((e.clientX+250-x-document.body.clientWidth/2)/(50/zoom))
-        let by = Math.floor((e.clientY+250-y-document.body.clientHeight/2)/(50/zoom))
-        let idx = ng.data.findIndex(item => (bx == item.x && by == item.y))
+        const bx = Math.floor((e.clientX+250-x-document.body.clientWidth/2)/(50/zoom))
+        const by = Math.floor((e.clientY+250-y-document.body.clientHeight/2)/(50/zoom))
+        const idx = ng.data.findIndex(item => (bx == item.x && by == item.y))
         if (idx == -1) {
             return
         }
-        ng.data[idx].d += 1
+        if (!(ng.data[idx].d == 0) || !(ng.bdata.findIndex(item => (item.x == bx) && (item.y == by)) == -1)) {return}
+        ng.bdata.push({
+            x: bx,
+            y: by,
+            id: buildings[selectedbuilding].id
+        })
+    })
+    document.querySelector("#bexit").addEventListener("click",()=>{
+        if (!(building) || !(screen == "game")) { return }
+        building = false
+        selectedbuilding = null
+        document.removeEventListener("click",ev)
     })
 }
-document.querySelector("#buildhome").addEventListener("click",function() {
-    beginbuilding("HomeBase")
+buildings.forEach((v,i)=>{
+    let c = document.createElement("span")
+    c.classList.add("gbitem")
+    c.innerHTML = `<img src="img/${v.id}.png">`
+    c.addEventListener("click",()=>{
+        beginbuilding(v.id)
+    })
+    document.querySelector("#gamebar").appendChild(c)
 })
+document.querySelectorAll(".bstat").forEach((v,i)=>{
+    v.style.bottom = `${12+i*3}vmin`
+})
+
 function render() {
     let tloop = new Date()
     fps = 1000/(tloop-lloop)
@@ -245,7 +312,7 @@ function render() {
     })
     if (screen == "loading") {
         function dots() {
-            let g = Math.ceil(Date.now() % 3000 / 1000)
+            const g = Math.ceil(Date.now() % 3000 / 1000)
             if (g == 1) {
                 return "."
             } else if (g == 2) {
@@ -262,12 +329,23 @@ function render() {
         document.querySelector("#menutitle").style.display = "none"
         document.querySelector("#gamebar").style.display = "block"
         document.querySelector("#stats").style.display = "block"
+        const yoffset = -250+document.body.clientHeight/2+y
+        const xoffset = -250+document.body.clientWidth/2+x
         ng.data.forEach((v, i) => {
-            ctx.drawImage(imgs[v.d], (v.x * 50/zoom)+x-250+document.body.clientWidth/2, (v.y * 50/zoom)+y-250+document.body.clientHeight/2, 50/zoom, 50/zoom)
+            ctx.drawImage(imgs[v.d], (v.x * 50/zoom)+xoffset, (v.y * 50/zoom)+yoffset, 50/zoom, 50/zoom)
+        })
+        ng.bdata.forEach((v,i)=> {
+            ctx.drawImage(imgs[buildings.findIndex(item => item.id == v.id)+9], (v.x * 50/zoom)+xoffset, (v.y * 50/zoom)+yoffset, 50/zoom, 50/zoom)
         })
     } else if (screen == "home") {
         document.querySelector("#gamebar").style.display = "none"
         document.querySelector("#stats").style.display = "none"
+    }
+    if (building) {
+        document.querySelector("#gamebar").style.display = "none"
+        document.querySelector("#buildbar").style.display = "block"
+    } else {
+        document.querySelector("#buildbar").style.display = "none"
     }
     document.querySelectorAll(".toggle").forEach((v) => {
         if (v.classList.contains("enabled")) {
@@ -286,7 +364,18 @@ function render() {
     document.querySelectorAll(".gbitem").forEach((v,i) => {
         v.style.left = `${1+i*10}vmin`
     })
+    document.querySelectorAll(".bitem").forEach((v,i) => {
+        v.style.left = `${1+i*10}vmin`
+    })
+    document.querySelectorAll(".bstat").forEach((v)=>{
+        if (building) {
+            v.style.display = "block"
+        } else {
+            v.style.display = "none"
+        }
+    })
     document.querySelector("#gamebar").style.width = `${document.querySelectorAll(".gbitem").length*10+1}vmin`
+    document.querySelector("#buildbar").style.width = `${document.querySelectorAll(".bitem").length*10+1}vmin`
     frame++
     requestAnimationFrame(render)
 }

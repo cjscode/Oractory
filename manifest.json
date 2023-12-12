@@ -1,0 +1,14 @@
+{
+    "description":"Oractory is an automation game set on the Moon, waiting with recources to be automated.",
+    "name":"Oractory",
+    "short_name":"Oractory",
+    "icons": [
+        {
+            "src":"img/Stone.png",
+            "type":"image/png"
+        }
+    ],
+    "orientation":"landscape",
+    "theme_color":"rgb(15,15,15)",
+    "display":"fullscreen"
+}

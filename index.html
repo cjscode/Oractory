@@ -6,9 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oractory</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel=“icon” href=”favicon.ico” type=“image/x-icon”>
+    <link href="favicon.ico" rel="icon">
     <script>
     window.addEventListener("error", function (e) {
-        alert(`Error occured: ${e.error} at #${e.lineno} in ${e.filename} - version: ${version}`)
+        document.body.innerHTML = ""
+        document.write(`Error occured: ${e.error} at #${e.lineno} in ${e.filename} - version: ${version}`)
     })
     </script>
 </head>
@@ -28,7 +32,6 @@
             <span class="gbitem"><img src="img/ZoomOut.png" id="zoomout"></span>
             <span class="gbitem"><img src="img/Reset.png" id="reset"></span>
             <span class="gbitem"><img src="img/UpgradeShop.png" id="upgshop"></span>
-            <span class="gbitem"><img src="img/HomeBase.png" id="buildhome"></span>
         </div>
         <span id="stats">
             <span class="statitem">Money: $$$</span>
@@ -37,8 +40,19 @@
             <span class="statitem">Money: $$$</span>
             <span class="statitem">Money: $$$</span>
         </span>
-        <span id="fps">60</span>
-        <span id="version">v1.0.0</span> 
+        <div id="buildbar">
+            <span class="bitem"><img src="img/ZoomIn.png" id="zoomin2"></span>
+            <span class="bitem"><img src="img/ZoomOut.png" id="zoomout2"></span>
+            <span class="bitem"><img src="img/Reset.png" id="reset2"></span>
+            <span class="bitem"><img id="selectedb"></span>
+            <span class="bitem"><img src="img/Exit.png" id="bexit"></span>
+        </div>
+        <span id="buildstats">
+            <span class="bstat">$money</span>
+            <span class="bstat">0/50</span>
+        </span>
+        <span id="fps"></span>
+        <span id="version"></span> 
     </div>
     <canvas id="game"></canvas>
     <script src="game.js"></script>
