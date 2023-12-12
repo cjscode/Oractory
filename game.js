@@ -3,7 +3,7 @@ let ctx = canv.getContext("2d")
 let screen = "home"
 let imgs = []
 let zoom = 1
-let version = "v1.0.4"
+let version = "v1.0.5"
 document.querySelector("#version").innerHTML = version
 let tiles = [
     "Air",
@@ -98,13 +98,6 @@ document.querySelector("#ng").addEventListener("click", function () {
 if (ctx == null) {
     alert("Your browser does not support this game. Please upgrade your browser to continue.")
 }
-window.addEventListener("error", function (e) {
-    document.querySelector("#error").innerHTML = `Error occured: ${e.error} at #${e.lineno} in ${e.filename} - version: ${version}`
-    document.querySelector("#error").display = "block"
-})
-function handleClick(e) {
-
-}
 let x = 0
 let y = 0
 let px = 0
@@ -117,12 +110,13 @@ let starx = []
 let stary = []
 let starspd = []
 let down = false
+let building = false
 for (let i = 0; i < 200; i++) {
     starx[i] = Math.random()
     stary[i] = Math.random()
     starspd[i] = Math.random() / 5
 }
-document.onmousedown = function (e) {
+function handledown (e) {
     if (!(screen == "game") || e.clientY >= document.body.clientHeight-Math.min(document.body.clientWidth,document.body.clientHeight)*0.11) { return }
     bx = x
     by = y
@@ -130,33 +124,40 @@ document.onmousedown = function (e) {
     dy = e.clientY
     down = true
 }
-document.onmouseup = function () {
-    down = false
+//pc
+document.onmousedown = handledown
+//mobile
+document.ontouchstart = (e) => {
+    handledown(e.touches[0])
 }
-document.onmousemove = function (e) {
+//global
+document.onmouseup = function () {down = false}
+function handlemove (e) {
     if (!(screen == "game") || e.clientY >= document.body.clientHeight-Math.min(document.body.clientWidth,document.body.clientHeight)*0.11 || !(down)) { return }
     x = e.clientX - dx + bx
     y = e.clientY - dy + by
 }
-document.onclick = function (e) {
-    if (!(screen == "game") || e.clientY >= document.body.clientHeight-Math.min(document.body.clientWidth,document.body.clientHeight)*0.11) { return }
-    handleClick(e)
+//pc
+document.onmousemove = handlemove
+//mobile
+document.ontouchmove = (e)=>{
+    handlemove(e.touches[0])
 }
 function zoomin () {
     if (zoom <= 0.5) {
         return
     }
     zoom = (zoom <= 0.5 ? 0.5 : zoom - 0.5)
-    x = -250*Math.pow(zoom,-1)+250+x/zoom
-    y = -250*Math.pow(zoom,-1)+250+y/zoom
+    //x = -250*Math.pow(zoom,-1)+250+x/zoom
+    //y = -250*Math.pow(zoom,-1)+250+y/zoom
 }
 function zoomout () {
     if (zoom >= 10) {
         return
     }
     zoom = (zoom >= 10 ? 10 : zoom + 0.5)
-    x = -250*Math.pow(zoom,-1)+250+x*zoom
-    y = -250*Math.pow(zoom,-1)+250+y*zoom
+    //x = -250*Math.pow(zoom,-1)+250+x*zoom
+    //y = -250*Math.pow(zoom,-1)+250+y*zoom
 }
 document.onwheel = function (e) {
     if (!(screen == "game")) { return }
@@ -194,6 +195,28 @@ document.querySelector("#reset").addEventListener("click",() => {
     x = 0
     y = 0
 })
+let selectedbuilding = null
+function beginbuilding (b) {
+    let index = buildings.findIndex(item => item.id == b)
+    building = true
+    alert(index)
+    document.addEventListener("click",(e)=>{
+        if (!(building)) {
+            return
+        }
+        if (!(screen == "game") || e.clientY >= document.body.clientHeight-Math.min(document.body.clientWidth,document.body.clientHeight)*0.11) { return }
+        let bx = Math.floor((e.clientX+250-x-document.body.clientWidth/2)/(50/zoom))
+        let by = Math.floor((e.clientY+250-y-document.body.clientHeight/2)/(50/zoom))
+        let idx = ng.data.findIndex(item => (bx == item.x && by == item.y))
+        if (idx == -1) {
+            return
+        }
+        ng.data[idx].d += 1
+    })
+}
+document.querySelector("#buildhome").addEventListener("click",function() {
+    beginbuilding("HomeBase")
+})
 function render() {
     let tloop = new Date()
     fps = 1000/(tloop-lloop)
@@ -204,7 +227,7 @@ function render() {
     y = (y < ((ng.exp-1)*500+250)*zoom ? ((ng.exp-1)*500+250)*zoom : y)
     y = (y > -((ng.exp-1)*500+250)*zoom ? -((ng.exp-1)*500+250)*zoom : y)
     */
-    document.querySelector("#fps").innerHTML = Math.floor(fps)+" - x:"+x+" y:"+y//+(document.body.clientWidth/2-((5 * 50/zoom)+x-250+document.body.clientWidth/2))+" y:"+(document.body.clientHeight/2-((5 * 50/zoom)+y-250+document.body.clientHeight/2))
+    document.querySelector("#fps").innerHTML = Math.floor(fps)
     canv.width = document.body.clientWidth
     canv.height = document.body.clientHeight
     canv.style.width = document.body.clientWidth+"px"

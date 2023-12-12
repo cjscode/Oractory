@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oractory</title>
     <link rel="stylesheet" href="style.css">
+    <script>
+    window.addEventListener("error", function (e) {
+        alert(`Error occured: ${e.error} at #${e.lineno} in ${e.filename} - version: ${version}`)
+    })
+    </script>
 </head>
 <body>
     <input id="loadfile" hidden type="file" accept=".json">
@@ -37,6 +42,5 @@
     </div>
     <canvas id="game"></canvas>
     <script src="game.js"></script>
-    <div id="error" style="display: none;width: 100%;height: 100%;text-align: center;background-color: black; color: white;z-index: 99999;position: absolute;"></div>  
 </body>
 </html>
