@@ -8,7 +8,7 @@
     <title>Oractory</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
-    <link rel=“icon” href=”favicon.ico” type=“image/x-icon”>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link href="favicon.ico" rel="icon">
     <script>
     window.addEventListener("error", function (e) {
@@ -49,9 +49,19 @@
             <span class="bitem"><img src="img/Exit.png" id="bexit"></span>
         </div>
         <span id="buildstats">
-            <span class="bstat">$money</span>
-            <span class="bstat">0/50</span>
+            <span class="bstat" id="bprice">$money</span>
+            <span class="bstat" id="bamount">0/50</span>
         </span>
+        <div id="upgui">
+            <span id="upgname">NAME HERE</span>
+            <span id="upgdesc">DESCRIPTION HERE SOME THING COOL SOME THING COOL SOME THING COOL SOME THING COOL SOME THING COOL SOME THING COOL SOME THING COOL SOME THING COOL</span>
+            <span id="upgstats">
+                <span class="ustat" id="uworth">Worth: $$$$$</span>
+                <span class="ustat" id="ulvl">LVL: 12345</span>
+                <span class="ustat" id="uhealth">Health: 12345</span>
+                <span class="ustat" id="udmg">DMG: 12345</span>
+            </span>
+        </div>
         <span id="fps"></span>
         <span id="version"></span> 
     </div>

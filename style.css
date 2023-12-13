@@ -145,3 +145,46 @@ html,body,head{
     text-align: center;
     font-size: 3vmin;
 }
+.disabled {
+    opacity: 0.3;
+}
+#upgui {
+    position: absolute;
+    width: calc(100% - 2vmin);
+    height: calc(100% - 2vmin);
+    background-color: rgb(60,60,60);
+    top: 1vmin;
+    left: 1vmin;
+    border-radius: 2.5vmin;
+    z-index: 5;
+    display: none;
+}
+#upgname {
+    color: rgb(240,240,240);
+    font-size: 5vmin;
+    width: calc(60% - 4vmin);
+    text-align: left;
+    position: absolute;
+    padding: 2vmin;
+}
+#upgdesc {
+    color: rgb(240,240,240);
+    font-size: 2.5vmin;
+    width: calc(60% - 4vmin);
+    top: 5vmin;
+    position: absolute;
+    text-align: left;
+    padding: 2vmin;
+}
+.ustat {
+    width: calc(40% - 4vmin);
+    right: 2vmin;
+    position: absolute;
+    float: right;
+    text-align: left;
+    padding: 0;
+    margin: 0;
+    translate: 0 2vmin;
+    font-size: 2.5vmin;
+    color: rgb(240,240,240);
+}
