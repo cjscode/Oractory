@@ -3,15 +3,16 @@ let ctx = canv.getContext("2d")
 let screen = "home"
 let imgs = []
 let zoom = 1
-let version = "v1.0.8"
+let version = "v1.0.9"
 document.querySelector("#version").innerHTML = version
-// audio stuff that is broken
-/*let bgm = new Audio("bg.mp3")
+// banger bg music
+let bgm = new Audio("bg.mp3")
 bgm.onended = function () {
     setTimeout(()=>{
         bgm.play()
     },500)
-}*/
+}
+// this is broken sometimes it doesnt play :(
 //let sfx = new Audio("build.mp3")
 function buildsfx() {
     //sfx.currentTime = 0
@@ -102,6 +103,7 @@ const buildings = [
         desc: "A hi-tech Adamantine Mine. Adamantine collected from here is worth $78,125."
     }
 ]
+let truckdata = []
 let tilechance = []
 tiles.forEach((v, x) => {
     let i = new Image()
@@ -119,6 +121,12 @@ buildings.forEach((v, x) => {
     i.src = `img/${v.id}.png`
     imgs.push(i)
 })
+let im = new Image()
+im.src="img/TruckRight.png"
+imgs.push(im)
+im = new Image()
+im.src="img/TruckLeft.png"
+imgs.push(im)
 let ng = {
     wave: 1,
     data: [],
@@ -177,7 +185,7 @@ document.querySelector("#loadfile").addEventListener("change", function () {
 })
 document.querySelector("#ng").addEventListener("click", function () {
     screen = "loading"
-    //bgm.play()
+    bgm.play()
     newgame()
 })
 if (ctx == null) {
@@ -334,12 +342,16 @@ function beginbuilding(b) {
             x: bx,
             y: by,
             id: buildings[selectedbuilding].id,
-            l: 1
+            l: 1,
+            i: []
         })
         ng.bct[selectedbuilding] = ng.bct[selectedbuilding] == undefined ? 1 : ng.bct[selectedbuilding] + 1
         document.querySelector("#bprice").innerHTML = `$${buildings[selectedbuilding].baseprice}`
         document.querySelector("#bamount").innerHTML = `${ng.bct[selectedbuilding]} / ${ng.lvl - (selectedbuilding - 2) * 3}`
         buildsfx()
+        if (!(selectedbuilding == 0)) {
+            newtruck(ng.bdata[ng.bdata.length-1],ng.bdata[0],"Stone",1)
+        }
         if (!(isenabled(selectedbuilding))) {
             building = false
             selectedbuilding = null
@@ -366,16 +378,16 @@ document.querySelectorAll(".bstat").forEach((v, i) => {
     v.style.bottom = `${12 + i * 3}vmin`
 })
 document.addEventListener("click", (e) => {
-    if (!(screen == "game") || building) {
+    if (!(screen == "game") || building || e.clientY >= document.body.clientHeight - Math.min(document.body.clientWidth, document.body.clientHeight) * 0.11) {
         return
     }
-    inspectingbuilding = true
     const bx = Math.floor((e.clientX + 250 - x - document.body.clientWidth / 2) / (50 / zoom))
     const by = Math.floor((e.clientY + 250 - y - document.body.clientHeight / 2) / (50 / zoom))
     const idx = ng.bdata.findIndex(item => (bx == item.x && by == item.y))
     if (idx == -1) {
         return
     }
+    inspectingbuilding = true
     const bidx = buildings.findIndex(item => item.id == ng.bdata[idx].id)
     document.querySelector("#upgname").innerHTML = `<b>${buildings[bidx].name}</b>`
     document.querySelector("#upgdesc").innerHTML = buildings[bidx].desc
@@ -383,7 +395,6 @@ document.addEventListener("click", (e) => {
     document.querySelector("#ulvl").innerHTML = `<b>Level:</b> ${ng.bdata[idx].l}`
     document.querySelector("#uhealth").innerHTML = `<b>Health:</b> ${buildings[bidx].basehealth}`
     document.querySelector("#udmg").innerHTML = `<b>DMG:</b> ${buildings[bidx].basedmg}`
-    document.querySelector("#upgui").style.display = "block"
 })
 function isenabled(idx) {
     if (idx < 0) { return false }
@@ -406,6 +417,21 @@ function isenabled(idx) {
         }
     }
     return true
+}
+document.querySelector("#upgexit").addEventListener("click",()=>{
+    inspectingbuilding = false
+})
+function newtruck (to,from,carrying,camount) {
+    truckdata.push({
+        tx: to.x,
+        ty: to.y,
+        x: from.x,
+        y: from.y,
+        item: {
+            a: camount,
+            n: carrying
+        }
+    })
 }
 function render() {
     let tloop = new Date()
@@ -454,11 +480,35 @@ function render() {
         document.querySelector("#stats").style.display = "block"
         const yoffset = -250 + document.body.clientHeight / 2 + y
         const xoffset = -250 + document.body.clientWidth / 2 + x
-        ng.data.forEach((v, i) => {
+        ng.data.forEach((v) => {
             ctx.drawImage(imgs[v.d], (v.x * 50 / zoom) + xoffset, (v.y * 50 / zoom) + yoffset, 50 / zoom, 50 / zoom)
         })
-        ng.bdata.forEach((v, i) => {
+        ng.bdata.forEach((v) => {
             ctx.drawImage(imgs[buildings.findIndex(item => item.id == v.id) + 9], (v.x * 50 / zoom) + xoffset, (v.y * 50 / zoom) + yoffset, 50 / zoom, 50 / zoom)
+        })
+        truckdata.forEach((v)=>{
+            let d = ""
+            const dir = (v.tx > v.x ? 90 : -90)-Math.atan((v.ty-v.y)/(v.tx-v.x))
+            if (v.tx > v.x) {
+                d = "r"
+                v.x += Math.min(1/fps,v.tx-v.x)
+            } else if (v.tx < v.x) {
+                d = "l"
+                v.x -= Math.min(1/fps,v.x-v.tx)
+            } else {
+                d = "r"
+            }
+            if (v.ty > v.y) {
+                v.y += Math.min(1/fps,v.ty-v.y)
+            } else if (v.ty < v.y) {
+                v.y -= Math.min(1/fps,v.y-v.ty)
+            }
+            ctx.drawImage(d == "l" ? imgs[imgs.length-1] : imgs[imgs.length-2],(v.x * 50 / zoom) + xoffset,(v.y * 50 / zoom) + yoffset,50/zoom,50/zoom)
+        })
+        truckdata.forEach((v,i)=>{
+            if (v.tx == v.x && v.ty == v.y) {
+                truckdata.splice(i,1)
+            }
         })
     } else if (screen == "home") {
         document.querySelector("#gamebar").style.display = "none"
@@ -505,10 +555,11 @@ function render() {
         }
     })
     document.querySelectorAll(".ustat").forEach((v, i) => {
-        v.style.top = `${i * 3}vmin`
+        v.style.top = `calc(${-8+i * 3}vmin + ${document.querySelector("#upgname").clientHeight + document.querySelector("#upgdesc").clientHeight}px)`
     })
     document.querySelector("#gamebar").style.width = `${document.querySelectorAll(".gbitem").length * 10 + 1}vmin`
     document.querySelector("#buildbar").style.width = `${document.querySelectorAll(".bitem").length * 10 + 1}vmin`
+    document.querySelector("#upgui").style.display = inspectingbuilding ? "block" : "none"
     frame++
     requestAnimationFrame(render)
 }
