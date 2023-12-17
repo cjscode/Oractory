@@ -197,3 +197,6 @@ html,body,head{
     top: 1vmin;
     right: 1vmin;
 }
+*::-webkit-scrollbar{
+    display: none;
+}

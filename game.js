@@ -3,7 +3,7 @@ let ctx = canv.getContext("2d")
 let screen = "home"
 let imgs = []
 let zoom = 1
-let version = "v1.0.9"
+let version = "v1.0.10"
 document.querySelector("#version").innerHTML = version
 // banger bg music
 let bgm = new Audio("bg.mp3")
@@ -254,6 +254,10 @@ function zoomout() {
 }
 document.onwheel = function (e) {
     if (!(screen == "game") || inspectingbuilding) { return }
+    if (e.clientY >= document.body.clientHeight - Math.min(document.body.clientWidth, document.body.clientHeight) * 0.11 ) {
+        document.querySelector(`#${building ? "buildbar" : "gamebar"}`).scrollLeft += e.deltaY
+        return
+    }
     if (e.deltaY == -100) {
         zoomin()
     } else if (e.deltaY == 100) {
@@ -350,7 +354,7 @@ function beginbuilding(b) {
         document.querySelector("#bamount").innerHTML = `${ng.bct[selectedbuilding]} / ${ng.lvl - (selectedbuilding - 2) * 3}`
         buildsfx()
         if (!(selectedbuilding == 0)) {
-            newtruck(ng.bdata[ng.bdata.length-1],ng.bdata[0],"Stone",1)
+            newtruck(ng.bdata[0],ng.bdata[ng.bdata.length-1],"Stone",1)
         }
         if (!(isenabled(selectedbuilding))) {
             building = false
@@ -433,6 +437,13 @@ function newtruck (to,from,carrying,camount) {
         }
     })
 }
+setTimeout(()=>{
+    setInterval(()=>{
+        ng.bdata.forEach((v,i)=>{
+            newtruck(ng.bdata[0],v,"Stone",1)
+        });
+    },100)
+},10000)
 function render() {
     let tloop = new Date()
     fps = 1000 / (tloop - lloop)
@@ -481,7 +492,7 @@ function render() {
         const yoffset = -250 + document.body.clientHeight / 2 + y
         const xoffset = -250 + document.body.clientWidth / 2 + x
         ng.data.forEach((v) => {
-            ctx.drawImage(imgs[v.d], (v.x * 50 / zoom) + xoffset, (v.y * 50 / zoom) + yoffset, 50 / zoom, 50 / zoom)
+            ctx.drawImage(imgs[v.d], (v.x * 50 / zoom) + xoffset, (v.y * 50 / zoom) + yoffset, Math.ceil(50 / zoom), Math.ceil(50 / zoom))
         })
         ng.bdata.forEach((v) => {
             ctx.drawImage(imgs[buildings.findIndex(item => item.id == v.id) + 9], (v.x * 50 / zoom) + xoffset, (v.y * 50 / zoom) + yoffset, 50 / zoom, 50 / zoom)
