@@ -164,7 +164,7 @@ html,body,head{
 #upgname {
     color: rgb(240,240,240);
     font-size: 5vmin;
-    width: calc(60% - 4vmin);
+    width: calc(100% - 10vmin);
     text-align: left;
     position: absolute;
     padding: 2vmin;
@@ -172,7 +172,7 @@ html,body,head{
 #upgdesc {
     color: rgb(240,240,240);
     font-size: 2.5vmin;
-    width: calc(60% - 4vmin);
+    width: calc(100% - 4vmin);
     top: 5vmin;
     position: absolute;
     text-align: left;
@@ -200,4 +200,38 @@ html,body,head{
 }
 *::-webkit-scrollbar{
     display: none;
+}
+.range {
+    width: calc(100% - 4vmin);
+    position: absolute;
+    margin: 2vmin;
+}
+#upercent {
+    position: absolute;
+    font-size: 2.5vmin;
+    color: rgb(240,240,240);
+    margin: 2vmin;
+    width: calc(100% - 4vmin);
+    text-align: center;
+}
+.invimg {
+    width: 10vmin;
+    height: 10vmin;
+    object-fit: contain;
+}
+#upginv {
+    width: calc(100% - 4vmin);
+    height: calc(50% - 4vmin);
+    position: absolute;
+    margin: 2vmin;
+    background-color: rgb(40,40,40);
+    overflow: scroll;
+}
+.invitem {
+    margin: 2vmin;
+    width: 100%;
+    overflow: hidden;
+    height: 12vmin;
+    padding: 1vmin;
+    border-radius: 2.5vmin;
 }

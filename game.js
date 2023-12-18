@@ -3,7 +3,7 @@ let ctx = canv.getContext("2d")
 let screen = "home"
 let imgs = []
 let zoom = 1
-let version = "v1.0.11"
+let version = "v1.0.12"
 document.querySelector("#version").innerHTML = version
 // banger bg music
 let bgm = new Audio("bg.mp3")
@@ -44,7 +44,8 @@ const buildings = [
         baseprice: 35,
         basedmg: 0,
         basehealth: 750,
-        desc: "A basic Stone Mine. Stone collected from here is worth $1."
+        desc: "A basic Stone Mine. Stone collected from here is worth $1.",
+        time: 1
     },
     {
         name: "Iron Mine",
@@ -52,7 +53,8 @@ const buildings = [
         baseprice: 192.5,
         basedmg: 0,
         basehealth: 900,
-        desc: "A small Iron Mine. Iron collected from here is worth $5."
+        desc: "A small Iron Mine. Iron collected from here is worth $5.",
+        time: 1
     },
     {
         name: "Gold Mine",
@@ -60,7 +62,8 @@ const buildings = [
         baseprice: 1058.75,
         basedmg: 0,
         basehealth: 1200,
-        desc: "A nice Gold Mine. Gold collected from here is worth $25."
+        desc: "A nice Gold Mine. Gold collected from here is worth $25.",
+        time: 1.5
     },
     {
         name: "Ruby Mine",
@@ -68,7 +71,8 @@ const buildings = [
         baseprice: 5823.13,
         basedmg: 0,
         basehealth: 1350,
-        desc: "A cool Ruby Mine. Rubies collected from here are worth $125."
+        desc: "A cool Ruby Mine. Rubies collected from here are worth $125.",
+        time: 1.5
     },
     {
         name: "Diamond Mine",
@@ -76,7 +80,8 @@ const buildings = [
         baseprice: 32027.19,
         basedmg: 0,
         basehealth: 1500,
-        desc: "A complex Diamond Mine. Diamonds collected from here are worth $625."
+        desc: "A complex Diamond Mine. Diamonds collected from here are worth $625.",
+        time: 2
     },
     {
         name: "Uranium Mine",
@@ -84,7 +89,8 @@ const buildings = [
         baseprice: 176149.53,
         basedmg: 0,
         basehealth: 1650,
-        desc: "An expensive Uranium Mine. Uranium collected from here is worth $3,125."
+        desc: "An expensive Uranium Mine. Uranium collected from here is worth $3,125.",
+        time: 2
     },
     {
         name: "Iridium Mine",
@@ -92,7 +98,8 @@ const buildings = [
         baseprice: 968822.42,
         basedmg: 0,
         basehealth: 1800,
-        desc: "A top-of-the-line Iridium Mine. Iridium collected from here is worth $15,625."
+        desc: "A top-of-the-line Iridium Mine. Iridium collected from here is worth $15,625.",
+        time: 2.5
     },
     {
         name: "Adamantine Mine",
@@ -100,7 +107,8 @@ const buildings = [
         baseprice: 5328523.32,
         basedmg: 0,
         basehealth: 1950,
-        desc: "A hi-tech Adamantine Mine. Adamantine collected from here is worth $78,125."
+        desc: "A hi-tech Adamantine Mine. Adamantine collected from here is worth $78,125.",
+        time: 2.5
     }
 ]
 let truckdata = []
@@ -348,7 +356,8 @@ function beginbuilding(b) {
             id: buildings[selectedbuilding].id,
             l: 1,
             i: [],
-            p: (selectedbuilding == 0 ? null : 1)
+            p: (selectedbuilding == 0 ? null : 1),
+            s: 5
         })
         ng.bct[selectedbuilding] = ng.bct[selectedbuilding] == undefined ? 1 : ng.bct[selectedbuilding] + 1
         document.querySelector("#bprice").innerHTML = `$${buildings[selectedbuilding].baseprice}`
@@ -379,6 +388,7 @@ buildings.forEach((v, i) => {
 document.querySelectorAll(".bstat").forEach((v, i) => {
     v.style.bottom = `${12 + i * 3}vmin`
 })
+let inspectidx = null
 document.addEventListener("click", (e) => {
     if (!(screen == "game") || building || e.clientY >= document.body.clientHeight - Math.min(document.body.clientWidth, document.body.clientHeight) * 0.11) {
         return
@@ -390,6 +400,12 @@ document.addEventListener("click", (e) => {
         return
     }
     inspectingbuilding = true
+    inspectidx = idx
+    document.querySelector("#uslider").value = ng.bdata[inspectidx].s
+    document.querySelector("#uslider").style.display = (ng.bdata[inspectidx].time ? "block" : "none")
+    const v = document.querySelector("#uslider").value
+    document.querySelector("#upercent").innerHTML = `Sell: ${100-v*10}% - Craft: ${v*10}%`
+    document.querySelector("#upercent").style.display = (ng.bdata[inspectidx].time ? "block" : "none")
     const bidx = buildings.findIndex(item => item.id == ng.bdata[idx].id)
     document.querySelector("#upgname").innerHTML = `<b>${buildings[bidx].name}</b>`
     document.querySelector("#upgdesc").innerHTML = buildings[bidx].desc
@@ -421,6 +437,8 @@ function isenabled(idx) {
     return true
 }
 document.querySelector("#upgexit").addEventListener("click", () => {
+    ng.bdata[inspectidx].s = document.querySelector("#uslider").value
+    inspectidx = null
     inspectingbuilding = false
 })
 function newtruck(to, from, carrying, camount) {
@@ -435,6 +453,10 @@ function newtruck(to, from, carrying, camount) {
         }
     })
 }
+document.querySelector("#uslider").addEventListener("input",(e)=>{
+    const v = document.querySelector("#uslider").value
+    document.querySelector("#upercent").innerHTML = `Sell: ${100-v*10}% - Craft: ${v*10}%`
+})
 function render() {
     let tloop = new Date()
     fps = 1000 / (tloop - lloop)
@@ -489,7 +511,7 @@ function render() {
             if (!(v.p == null)) {
                 v.p -= 1 / fps
                 if (v.p <= 0) {
-                    v.p = 1
+                    v.p = buildings[buildings.findIndex(item => (item.id == v.id))].time
                     let d = false
                     let idx = buildings.findIndex(item => (item.id == v.id))
                     if (idx >= 1 && idx <= 8) {
@@ -591,6 +613,8 @@ function render() {
     document.querySelectorAll(".ustat").forEach((v, i) => {
         v.style.top = `calc(${-8 + i * 3}vmin + ${document.querySelector("#upgname").clientHeight + document.querySelector("#upgdesc").clientHeight}px)`
     })
+    document.querySelector("#upercent").style.top = `calc(${-4+document.querySelectorAll(".ustat").length*2.5}vmin + ${document.querySelector("#upgname").clientHeight + document.querySelector("#upgdesc").clientHeight}px)` 
+    document.querySelector("#uslider").style.top = `calc(${document.querySelectorAll(".ustat").length*2.5}vmin + ${document.querySelector("#upgname").clientHeight + document.querySelector("#upgdesc").clientHeight}px)`
     document.querySelector("#gamebar").style.width = `${document.querySelectorAll(".gbitem").length * 10 + 1}vmin`
     document.querySelector("#buildbar").style.width = `${document.querySelectorAll(".bitem").length * 10 + 1}vmin`
     document.querySelector("#upgui").style.display = inspectingbuilding ? "block" : "none"
