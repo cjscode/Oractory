@@ -196,6 +196,7 @@ html,body,head{
     position: absolute;
     top: 1vmin;
     right: 1vmin;
+    z-index: 90;
 }
 *::-webkit-scrollbar{
     display: none;

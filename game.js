@@ -3,14 +3,14 @@ let ctx = canv.getContext("2d")
 let screen = "home"
 let imgs = []
 let zoom = 1
-let version = "v1.0.10"
+let version = "v1.0.11"
 document.querySelector("#version").innerHTML = version
 // banger bg music
 let bgm = new Audio("bg.mp3")
 bgm.onended = function () {
-    setTimeout(()=>{
+    setTimeout(() => {
         bgm.play()
-    },500)
+    }, 500)
 }
 // this is broken sometimes it doesnt play :(
 //let sfx = new Audio("build.mp3")
@@ -122,10 +122,10 @@ buildings.forEach((v, x) => {
     imgs.push(i)
 })
 let im = new Image()
-im.src="img/TruckRight.png"
+im.src = "img/TruckRight.png"
 imgs.push(im)
 im = new Image()
-im.src="img/TruckLeft.png"
+im.src = "img/TruckLeft.png"
 imgs.push(im)
 let ng = {
     wave: 1,
@@ -254,7 +254,7 @@ function zoomout() {
 }
 document.onwheel = function (e) {
     if (!(screen == "game") || inspectingbuilding) { return }
-    if (e.clientY >= document.body.clientHeight - Math.min(document.body.clientWidth, document.body.clientHeight) * 0.11 ) {
+    if (e.clientY >= document.body.clientHeight - Math.min(document.body.clientWidth, document.body.clientHeight) * 0.11) {
         document.querySelector(`#${building ? "buildbar" : "gamebar"}`).scrollLeft += e.deltaY
         return
     }
@@ -347,15 +347,13 @@ function beginbuilding(b) {
             y: by,
             id: buildings[selectedbuilding].id,
             l: 1,
-            i: []
+            i: [],
+            p: (selectedbuilding == 0 ? null : 1)
         })
         ng.bct[selectedbuilding] = ng.bct[selectedbuilding] == undefined ? 1 : ng.bct[selectedbuilding] + 1
         document.querySelector("#bprice").innerHTML = `$${buildings[selectedbuilding].baseprice}`
         document.querySelector("#bamount").innerHTML = `${ng.bct[selectedbuilding]} / ${ng.lvl - (selectedbuilding - 2) * 3}`
         buildsfx()
-        if (!(selectedbuilding == 0)) {
-            newtruck(ng.bdata[0],ng.bdata[ng.bdata.length-1],"Stone",1)
-        }
         if (!(isenabled(selectedbuilding))) {
             building = false
             selectedbuilding = null
@@ -422,10 +420,10 @@ function isenabled(idx) {
     }
     return true
 }
-document.querySelector("#upgexit").addEventListener("click",()=>{
+document.querySelector("#upgexit").addEventListener("click", () => {
     inspectingbuilding = false
 })
-function newtruck (to,from,carrying,camount) {
+function newtruck(to, from, carrying, camount) {
     truckdata.push({
         tx: to.x,
         ty: to.y,
@@ -437,13 +435,6 @@ function newtruck (to,from,carrying,camount) {
         }
     })
 }
-setTimeout(()=>{
-    setInterval(()=>{
-        ng.bdata.forEach((v,i)=>{
-            newtruck(ng.bdata[0],v,"Stone",1)
-        });
-    },100)
-},10000)
 function render() {
     let tloop = new Date()
     fps = 1000 / (tloop - lloop)
@@ -495,30 +486,62 @@ function render() {
             ctx.drawImage(imgs[v.d], (v.x * 50 / zoom) + xoffset, (v.y * 50 / zoom) + yoffset, Math.ceil(50 / zoom), Math.ceil(50 / zoom))
         })
         ng.bdata.forEach((v) => {
+            if (!(v.p == null)) {
+                v.p -= 1 / fps
+                if (v.p <= 0) {
+                    v.p = 1
+                    let d = false
+                    let idx = buildings.findIndex(item => (item.id == v.id))
+                    if (idx >= 1 && idx <= 8) {
+                        if (ng.data[ng.data.findIndex(item => (item.x == v.x - 1 && item.y == v.y && v.id.split("Mine")[0] == tiles[item.d]))]) {
+                            d = true
+                        } else if (ng.data[ng.data.findIndex(item => (item.x == v.x - 1 && item.y == v.y + 1 && v.id.split("Mine")[0] == tiles[item.d]))]) {
+                            d = true
+                        } else if (ng.data[ng.data.findIndex(item => (item.x == v.x && item.y == v.y + 1 && v.id.split("Mine")[0] == tiles[item.d]))]) {
+                            d = true
+                        } else if (ng.data[ng.data.findIndex(item => (item.x == v.x + 1 && item.y == v.y + 1 && v.id.split("Mine")[0] == tiles[item.d]))]) {
+                            d = true
+                        } else if (ng.data[ng.data.findIndex(item => (item.x == v.x + 1 && item.y == v.y && v.id.split("Mine")[0] == tiles[item.d]))]) {
+                            d = true
+                        } else if (ng.data[ng.data.findIndex(item => (item.x == v.x + 1 && item.y == v.y - 1 && v.id.split("Mine")[0] == tiles[item.d]))]) {
+                            d = true
+                        } else if (ng.data[ng.data.findIndex(item => (item.x == v.x && item.y == v.y - 1 && v.id.split("Mine")[0] == tiles[item.d]))]) {
+                            d = true
+                        } else if (ng.data[ng.data.findIndex(item => (item.x == v.x - 1 && item.y == v.y - 1 && v.id.split("Mine")[0] == tiles[item.d]))]) {
+                            d = true
+                        }
+                    } else {
+                        d = true
+                    }
+                    if (d) {
+                        newtruck(ng.bdata[0], v, "Stone", 1)
+                    }
+                }
+            }
             ctx.drawImage(imgs[buildings.findIndex(item => item.id == v.id) + 9], (v.x * 50 / zoom) + xoffset, (v.y * 50 / zoom) + yoffset, 50 / zoom, 50 / zoom)
         })
-        truckdata.forEach((v)=>{
+        truckdata.forEach((v) => {
             let d = ""
-            const dir = (v.tx > v.x ? 90 : -90)-Math.atan((v.ty-v.y)/(v.tx-v.x))
+            const dir = (v.tx > v.x ? 90 : -90) - Math.atan((v.ty - v.y) / (v.tx - v.x))
             if (v.tx > v.x) {
                 d = "r"
-                v.x += Math.min(1/fps,v.tx-v.x)
+                v.x += Math.min(1 / fps, v.tx - v.x)
             } else if (v.tx < v.x) {
                 d = "l"
-                v.x -= Math.min(1/fps,v.x-v.tx)
+                v.x -= Math.min(1 / fps, v.x - v.tx)
             } else {
                 d = "r"
             }
             if (v.ty > v.y) {
-                v.y += Math.min(1/fps,v.ty-v.y)
+                v.y += Math.min(1 / fps, v.ty - v.y)
             } else if (v.ty < v.y) {
-                v.y -= Math.min(1/fps,v.y-v.ty)
+                v.y -= Math.min(1 / fps, v.y - v.ty)
             }
-            ctx.drawImage(d == "l" ? imgs[imgs.length-1] : imgs[imgs.length-2],(v.x * 50 / zoom) + xoffset,(v.y * 50 / zoom) + yoffset,50/zoom,50/zoom)
+            ctx.drawImage(d == "l" ? imgs[imgs.length - 1] : imgs[imgs.length - 2], (v.x * 50 / zoom) + xoffset, (v.y * 50 / zoom) + yoffset, 50 / zoom, 50 / zoom)
         })
-        truckdata.forEach((v,i)=>{
+        truckdata.forEach((v, i) => {
             if (v.tx == v.x && v.ty == v.y) {
-                truckdata.splice(i,1)
+                truckdata.splice(i, 1)
             }
         })
     } else if (screen == "home") {
@@ -566,7 +589,7 @@ function render() {
         }
     })
     document.querySelectorAll(".ustat").forEach((v, i) => {
-        v.style.top = `calc(${-8+i * 3}vmin + ${document.querySelector("#upgname").clientHeight + document.querySelector("#upgdesc").clientHeight}px)`
+        v.style.top = `calc(${-8 + i * 3}vmin + ${document.querySelector("#upgname").clientHeight + document.querySelector("#upgdesc").clientHeight}px)`
     })
     document.querySelector("#gamebar").style.width = `${document.querySelectorAll(".gbitem").length * 10 + 1}vmin`
     document.querySelector("#buildbar").style.width = `${document.querySelectorAll(".bitem").length * 10 + 1}vmin`
