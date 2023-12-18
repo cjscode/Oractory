@@ -1,88 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!--meta-->
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Oractory</title>
+    <!--linking-->
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link href="favicon.ico" rel="icon">
+    <!--error script-->
     <script>
-    window.addEventListener("error", function (e) {
-        document.body.innerHTML = ""
-        document.write(`Error occured: ${e.error} at #${e.lineno} in ${e.filename} - version: ${version}`)
-    })
+        window.addEventListener("error", function (e) {
+            document.body.innerHTML = ""
+            document.write(`Error occured: ${e.error} at #${e.lineno} in ${e.filename} - version: ${version}`)
+        })
     </script>
+    <!--preload images so they dont flicker and stuff-->
+    <link rel="preload" href="img/Stone.png" as="image">
+    <link rel="preload" href="img/StoneMine.png" as="image">
+    <link rel="preload" href="img/Iron.png" as="image">
+    <link rel="preload" href="img/IronMine.png" as="image">
+    <link rel="preload" href="img/Gold.png" as="image">
+    <link rel="preload" href="img/GoldMine.png" as="image">
+    <link rel="preload" href="img/Ruby.png" as="image">
+    <link rel="preload" href="img/RubyMine.png" as="image">
+    <link rel="preload" href="img/Diamond.png" as="image">
+    <link rel="preload" href="img/DiamondMine.png" as="image">
+    <link rel="preload" href="img/Uranium.png" as="image">
+    <link rel="preload" href="img/UraniumMine.png" as="image">
+    <link rel="preload" href="img/Iridium.png" as="image">
+    <link rel="preload" href="img/IridiumMine.png" as="image">
+    <link rel="preload" href="img/Adamantine.png" as="image">
+    <link rel="preload" href="img/AdamantineMine.png" as="image">
 </head>
 <body>
-    <input id="loadfile" hidden type="file" accept=".json">
-    <div id="overlay">
-        <p id="menutitle">ORACTORY</p>
-        <span id="buttons">
-            <button id="ng" data-show="home">New Game</button>
-            <button id="lgsave" data-show="home">Load Save</button>
-            <button id="lgfile" data-show="home" onclick="document.querySelector('#loadfile').click()">Load File</button>
-            <button id="settings" data-show="home">Settings</button>
-        </span>
-        <p id="loading" data-show="loading">Loading...</p>
-        <div id="gamebar">
-            <span class="gbitem"><img src="img/ZoomIn.png" id="zoomin"></span>
-            <span class="gbitem"><img src="img/ZoomOut.png" id="zoomout"></span>
-            <span class="gbitem"><img src="img/Reset.png" id="reset"></span>
-            <span class="gbitem"><img src="img/UpgradeShop.png" id="upgshop"></span>
-        </div>
-        <span id="stats">
-            <span class="statitem">Money: $$$</span>
-        </span>
-        <div id="buildbar">
-            <span class="bitem"><img src="img/ZoomIn.png" id="zoomin2"></span>
-            <span class="bitem"><img src="img/ZoomOut.png" id="zoomout2"></span>
-            <span class="bitem"><img src="img/Reset.png" id="reset2"></span>
-            <span class="bitem"><img id="selectedb"></span>
-            <span class="bitem"><img src="img/Exit.png" id="bexit"></span>
-        </div>
-        <span id="buildstats">
-            <span class="bstat" id="bprice">$money</span>
-            <span class="bstat" id="bamount">0/50</span>
-        </span>
-        <div id="upgui">
-            <img id="upgexit" src="img/Exit.png">
-            <span id="upgname">NAME HERE</span>
-            <span id="upgdesc">DESCRIPTION HERE SOME THING COOL SOME THING COOL SOME THING COOL SOME THING COOL SOME THING COOL SOME THING COOL SOME THING COOL SOME THING COOL</span>
-            <span id="upgstats">
-                <span class="ustat" id="uworth">Worth: $$$$$</span>
-                <span class="ustat" id="ulvl">LVL: 12345</span>
-                <span class="ustat" id="uhealth">Health: 12345</span>
-                <span class="ustat" id="udmg">DMG: 12345</span>
+    <!--stops safari from adding excess links-->
+    <a href="#">
+        <!--allows you to load a game file-->
+        <input id="loadfile" hidden type="file" accept=".json">
+        <!--overlay-->
+        <div id="overlay">
+            <!--menu title-->
+            <p id="menutitle">ORACTORY</p>
+            <!--menu buttons-->
+            <span id="buttons">
+                <button id="ng" data-show="home">New Game</button>
+                <button id="lgsave" data-show="home">Load Save</button>
+                <button id="lgfile" data-show="home" onclick="document.querySelector('#loadfile').click()">Load File</button>
+                <button id="settings" data-show="home">Settings</button>
             </span>
-            <div id="upginv">
-                <span class="invitem">
-                    <img src="img/Stone.png" class="invimg">
-                    <p class="invp">Stone - 9999999999999</p>
-                </span>
-                <span class="invitem">
-                    <img src="img/Stone.png" class="invimg">
-                    <p class="invp">Stone - 9999999999999</p>
-                </span>
-                <span class="invitem">
-                    <img src="img/Stone.png" class="invimg">
-                    <p class="invp">Stone - 9999999999999</p>
-                </span>
-                <span class="invitem">
-                    <img src="img/Stone.png" class="invimg">
-                    <p class="invp">Stone - 9999999999999</p>
-                </span>
+            <!--loading text-->
+            <p id="loading" data-show="loading">Loading...</p>
+            <!--game bar-->
+            <div id="gamebar">
+                <span class="gbitem"><img src="img/ZoomIn.png" id="zoomin"></span>
+                <span class="gbitem"><img src="img/ZoomOut.png" id="zoomout"></span>
+                <span class="gbitem"><img src="img/Reset.png" id="reset"></span>
+                <span class="gbitem"><img src="img/UpgradeShop.png" id="upgshop"></span>
             </div>
-            <p id="upercent">Sell: 50% - Craft: 50%</p>
-            <input type="range" max="10" min="0" step="1" id="uslider" class="range" value="5">
+            <!--stats-->
+            <span id="stats">
+                <span class="statitem">Money: Loading...</span>
+            </span>
+            <!--build bar-->
+            <div id="buildbar">
+                <span class="bitem"><img src="img/ZoomIn.png" id="zoomin2"></span>
+                <span class="bitem"><img src="img/ZoomOut.png" id="zoomout2"></span>
+                <span class="bitem"><img src="img/Reset.png" id="reset2"></span>
+                <span class="bitem"><img id="selectedb"></span>
+                <span class="bitem"><img src="img/Exit.png" id="bexit"></span>
+            </div>
+            <!--building stats-->
+            <span id="buildstats">
+                <span class="bstat" id="bprice">Loading...</span>
+                <span class="bstat" id="bamount">Loading...</span>
+            </span>
+            <!--upgrade ui-->
+            <div id="upgui">
+                <img id="upgexit" src="img/Exit.png">
+                <span id="upgname">Loading...</span>
+                <span id="upgdesc">Loading...</span>
+                <!--upgrade stats-->
+                <span id="upgstats">
+                    <span class="ustat" id="uworth">Worth: Loading...</span>
+                    <span class="ustat" id="ulvl">LVL: Loading...</span>
+                    <span class="ustat" id="uhealth">Health: Loading...</span>
+                    <span class="ustat" id="udmg">DMG: Loading...</span>
+                    <span class="ustat" id="utime">Process Time: Loading...</span>
+                </span>
+                <!--inventory-->
+                <div id="upginv">
+                    <!--inventory item template-->
+                    <!--<span class="invitem">
+                        <img src="img/Stone.png" class="invimg">
+                        <p class="invp"></p>
+                    </span>-->
+                </div>
+                <!--percent of output going to be sold or crafted-->
+                <p id="upercent">Sell: Loading... - Craft: Loading...</p>
+                <input type="range" max="10" min="0" step="1" id="uslider" class="range" value="5">
+            </div>
+            <!--fps and version-->
+            <span id="fps">Counting FPS...</span>
+            <span id="version"></span>
         </div>
-        <span id="fps"></span>
-        <span id="version"></span> 
-    </div>
+    </a>
+    <!--game canvas-->
     <canvas id="game"></canvas>
+    <!--scripts-->
     <script src="game.js"></script>
 </body>
 </html>

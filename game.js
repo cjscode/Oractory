@@ -3,18 +3,19 @@ let ctx = canv.getContext("2d")
 let screen = "home"
 let imgs = []
 let zoom = 1
-let version = "v1.0.12"
+let version = "v1.0.13"
 document.querySelector("#version").innerHTML = version
-// banger bg music
+//banger bg music
 let bgm = new Audio("bg.mp3")
 bgm.onended = function () {
     setTimeout(() => {
         bgm.play()
     }, 500)
 }
-// this is broken sometimes it doesnt play :(
+//this is broken sometimes it doesnt play :(
 //let sfx = new Audio("build.mp3")
 function buildsfx() {
+    return
     //sfx.currentTime = 0
     //sfx.play()
 }
@@ -275,7 +276,7 @@ document.onwheel = function (e) {
 let frame = 0
 let fps = 60
 let lloop = new Date()
-document.onkeyup = (e) => {
+document.onkeydown = (e) => {
     if (!(screen == "game")) { return }
     if (e.key == "i") {
         zoomin()
@@ -355,7 +356,7 @@ function beginbuilding(b) {
             y: by,
             id: buildings[selectedbuilding].id,
             l: 1,
-            i: [],
+            i: {},
             p: (selectedbuilding == 0 ? null : 1),
             s: 5
         })
@@ -401,10 +402,17 @@ document.addEventListener("click", (e) => {
     }
     inspectingbuilding = true
     inspectidx = idx
+    document.querySelector("#upginv").innerHTML = ""
+    for (let key in ng.bdata[idx].i) {
+        let c = document.createElement("span")
+        c.classList.add("invitem")
+        c.innerHTML = `<img src="img/${key}.png" class="invimg"><p class="invp">${key} - ${ng.bdata[idx].i[key]}</p>`
+        document.querySelector("#upginv").appendChild(c)
+    }
     document.querySelector("#uslider").value = ng.bdata[inspectidx].s
     document.querySelector("#uslider").style.display = (ng.bdata[inspectidx].time ? "block" : "none")
     const v = document.querySelector("#uslider").value
-    document.querySelector("#upercent").innerHTML = `Sell: ${100-v*10}% - Craft: ${v*10}%`
+    document.querySelector("#upercent").innerHTML = `Sell: ${100 - v * 10}% - Craft: ${v * 10}%`
     document.querySelector("#upercent").style.display = (ng.bdata[inspectidx].time ? "block" : "none")
     const bidx = buildings.findIndex(item => item.id == ng.bdata[idx].id)
     document.querySelector("#upgname").innerHTML = `<b>${buildings[bidx].name}</b>`
@@ -413,6 +421,8 @@ document.addEventListener("click", (e) => {
     document.querySelector("#ulvl").innerHTML = `<b>Level:</b> ${ng.bdata[idx].l}`
     document.querySelector("#uhealth").innerHTML = `<b>Health:</b> ${buildings[bidx].basehealth}`
     document.querySelector("#udmg").innerHTML = `<b>DMG:</b> ${buildings[bidx].basedmg}`
+    document.querySelector("#utime").innerHTML = `<b>Process Time:</b> ${buildings[bidx].time}s`
+    document.querySelector("#utime").style.display = (buildings[bidx].time ? "block" : "none")
 })
 function isenabled(idx) {
     if (idx < 0) { return false }
@@ -453,9 +463,9 @@ function newtruck(to, from, carrying, camount) {
         }
     })
 }
-document.querySelector("#uslider").addEventListener("input",(e)=>{
+document.querySelector("#uslider").addEventListener("input", (e) => {
     const v = document.querySelector("#uslider").value
-    document.querySelector("#upercent").innerHTML = `Sell: ${100-v*10}% - Craft: ${v*10}%`
+    document.querySelector("#upercent").innerHTML = `Sell: ${100 - v * 10}% - Craft: ${v * 10}%`
 })
 function render() {
     let tloop = new Date()
@@ -536,7 +546,7 @@ function render() {
                         d = true
                     }
                     if (d) {
-                        newtruck(ng.bdata[0], v, "Stone", 1)
+                        newtruck(ng.bdata[0], v, v.id.split("Mine")[0], 1)
                     }
                 }
             }
@@ -563,7 +573,18 @@ function render() {
         })
         truckdata.forEach((v, i) => {
             if (v.tx == v.x && v.ty == v.y) {
+                const to = ng.bdata[ng.bdata.findIndex(item => (item.x == v.tx && item.y == v.ty))]
+                to.i[v.item.n] = (!(to.i[v.item.n]) ? v.item.a : to.i[v.item.n] + v.item.a)
                 truckdata.splice(i, 1)
+                if (inspectingbuilding) {
+                    document.querySelector("#upginv").innerHTML = ""
+                    for (let key in ng.bdata[inspectidx].i) {
+                        let c = document.createElement("span")
+                        c.classList.add("invitem")
+                        c.innerHTML = `<img src="img/${key}.png" class="invimg"><p class="invp">${key} - ${to.i[key]}</p>`
+                        document.querySelector("#upginv").appendChild(c)
+                    }
+                }
             }
         })
     } else if (screen == "home") {
@@ -613,8 +634,11 @@ function render() {
     document.querySelectorAll(".ustat").forEach((v, i) => {
         v.style.top = `calc(${-8 + i * 3}vmin + ${document.querySelector("#upgname").clientHeight + document.querySelector("#upgdesc").clientHeight}px)`
     })
-    document.querySelector("#upercent").style.top = `calc(${-4+document.querySelectorAll(".ustat").length*2.5}vmin + ${document.querySelector("#upgname").clientHeight + document.querySelector("#upgdesc").clientHeight}px)` 
-    document.querySelector("#uslider").style.top = `calc(${document.querySelectorAll(".ustat").length*2.5}vmin + ${document.querySelector("#upgname").clientHeight + document.querySelector("#upgdesc").clientHeight}px)`
+    document.querySelectorAll(".invitem").forEach((v, i) => {
+        v.style.top = `${14 * i + 2}vmin`
+    })
+    document.querySelector("#upercent").style.top = `calc(${-4 + document.querySelectorAll(".ustat").length * 2.5}vmin + ${document.querySelector("#upgname").clientHeight + document.querySelector("#upgdesc").clientHeight}px)`
+    document.querySelector("#uslider").style.top = `calc(${document.querySelectorAll(".ustat").length * 2.5}vmin + ${document.querySelector("#upgname").clientHeight + document.querySelector("#upgdesc").clientHeight}px)`
     document.querySelector("#gamebar").style.width = `${document.querySelectorAll(".gbitem").length * 10 + 1}vmin`
     document.querySelector("#buildbar").style.width = `${document.querySelectorAll(".bitem").length * 10 + 1}vmin`
     document.querySelector("#upgui").style.display = inspectingbuilding ? "block" : "none"
