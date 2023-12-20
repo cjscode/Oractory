@@ -16,7 +16,7 @@
     <script>
         window.addEventListener("error", function (e) {
             document.body.innerHTML = ""
-            document.write(`Error occured: ${e.error} at #${e.lineno} in ${e.filename} - version: ${version}`)
+            document.write(`<b>Error occured:</b><br> ${e.error} at #${e.lineno} in ${e.filename} - version: ${version}`)
         })
     </script>
     <!--preload images so they dont flicker and stuff-->

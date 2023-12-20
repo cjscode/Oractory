@@ -4,7 +4,7 @@ let screen = "home"
 let imgs = []
 let zoom = 1
 let selectedtab = 0
-let version = "v1.0.14"
+let version = "v1.0.15"
 document.querySelector("#version").innerHTML = version
 //banger bg music
 let bgm = new Audio("bg.mp3")
