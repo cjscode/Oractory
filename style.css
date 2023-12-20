@@ -205,6 +205,7 @@ html,body,head{
     width: calc(100% - 4vmin);
     position: absolute;
     margin: 2vmin;
+    height: 2vmin;
 }
 #upercent {
     position: absolute;
@@ -229,9 +230,11 @@ html,body,head{
     position: absolute;
     margin: 2vmin;
     background-color: rgb(40,40,40);
-    overflow: scroll;
     bottom: 0;
     border-radius: 2.5vmin;
+}
+#inv {
+    overflow: scroll;
 }
 .invitem {
     width: calc(100% - 4vmin);
@@ -253,4 +256,31 @@ html,body,head{
     translate: 0 -50%;
     color:rgb(240, 240, 240);
     font-size: 2.5vmin;
+}
+#buttonspan {
+    background-color: rgb(40,40,40);
+    width: calc(100% - 4vmin);
+    height: 6vmin;
+    position: absolute;
+    bottom: 50%;
+    left: 2vmin;
+    border-radius: 2.5vmin;
+}
+.invbutton {
+    height: 4vmin;
+    width: 25vmin;
+    translate: 1vmin 1vmin;
+    border-radius: 1vmin;
+    border: 0;
+    color:rgb(240, 240, 240);
+    font-size: 2vmin;
+}
+.invbutton:not(.selected) {
+    background-color: rgb(60,60,60);
+}
+.invbutton.selected {
+    background-color: rgb(80,80,80);
+}
+.invbutton.locked {
+    display: none;
 }

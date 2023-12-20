@@ -36,9 +36,10 @@
     <link rel="preload" href="img/IridiumMine.png" as="image">
     <link rel="preload" href="img/Adamantine.png" as="image">
     <link rel="preload" href="img/AdamantineMine.png" as="image">
+    <link rel="preload" href="img/HomeBase.png" as="image">
 </head>
 <body>
-    <!--stops safari from adding excess links-->
+    <!--stops some browsers from adding excess links-->
     <a href="#">
         <!--allows you to load a game file-->
         <input id="loadfile" hidden type="file" accept=".json">
@@ -64,14 +65,14 @@
             </div>
             <!--stats-->
             <span id="stats">
-                <span class="statitem">Money: Loading...</span>
+                <span class="statitem" id="smoney">Money: Loading...</span>
             </span>
             <!--build bar-->
             <div id="buildbar">
                 <span class="bitem"><img src="img/ZoomIn.png" id="zoomin2"></span>
                 <span class="bitem"><img src="img/ZoomOut.png" id="zoomout2"></span>
                 <span class="bitem"><img src="img/Reset.png" id="reset2"></span>
-                <span class="bitem"><img id="selectedb"></span>
+                <span class="bitem"><img id="selectedb" src="img/Air.png"></span>
                 <span class="bitem"><img src="img/Exit.png" id="bexit"></span>
             </div>
             <!--building stats-->
@@ -93,12 +94,21 @@
                     <span class="ustat" id="utime">Process Time: Loading...</span>
                 </span>
                 <!--inventory-->
+                <span id="buttonspan">
+                    <button class="invbutton" id="invinv">Storage</button>
+                    <button class="invbutton" id="invrecipe">Recipe</button>
+                </span>
                 <div id="upginv">
-                    <!--inventory item template-->
-                    <!--<span class="invitem">
-                        <img src="img/Stone.png" class="invimg">
-                        <p class="invp"></p>
-                    </span>-->
+                    <div id="recipes">
+                        <p style="color:rgb(240,240,240)">recipes</p>
+                    </div>
+                    <div id="inv">
+                        <!--inventory item template-->
+                        <!--<span class="invitem">
+                            <img src="img/Stone.png" class="invimg">
+                            <p class="invp"></p>
+                        </span>-->
+                    </div>
                 </div>
                 <!--percent of output going to be sold or crafted-->
                 <p id="upercent">Sell: Loading... - Craft: Loading...</p>
