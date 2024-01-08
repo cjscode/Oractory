@@ -1,10 +1,15 @@
+if (!(localStorage.getItem("visited-dev") == "yes")) {
+    alert("Oractory is still in development. Things are subject to change or to break. Also, when Oractory releases (v2.0.0) ALL previous save files will be removed.")
+    alert("By proceeding, you agree to this game's localStorage policy. (oractory.vercel.app/privacy.txt)")
+    localStorage.setItem("visited-dev", "yes")
+}
 let canv = document.querySelector("#game")
 let ctx = canv.getContext("2d")
 let screen = "home"
 let imgs = []
 let zoom = 1
 let selectedtab = 0
-let version = "v1.0.15"
+let version = "v1.0.16"
 document.querySelector("#version").innerHTML = version
 //banger bg music
 let bgm = new Audio("bg.mp3")
@@ -34,62 +39,62 @@ const tiles = [
 const itemdata = {
     "Stone": {
         price: 1,
-        src:"RawStone.png",
+        src: "RawStone.png",
         name: "Raw Stone"
     },
     "Iron": {
         price: 5,
-        src:"RawIron.png",
+        src: "RawIron.png",
         name: "Raw Iron"
     },
     "Gold": {
         price: 25,
-        src:"RawGold.png",
+        src: "RawGold.png",
         name: "Raw Gold"
     },
     "Ruby": {
         price: 125,
-        src:"RawRuby.png",
+        src: "RawRuby.png",
         name: "Raw Ruby"
     },
     "Diamond": {
         price: 625,
-        src:"RawDiamond.png",
+        src: "RawDiamond.png",
         name: "Raw Diamond"
     },
     "Uranium": {
         price: 3125,
-        src:"RawUranium.png",
+        src: "RawUranium.png",
         name: "Raw Uranium"
     },
     "Iridium": {
         price: 15625,
-        src:"RawIridium.png",
+        src: "RawIridium.png",
         name: "Raw Iridium"
     },
     "Adamantine": {
         price: 78125,
-        src:"RawAdamantine.png",
+        src: "RawAdamantine.png",
         name: "Raw Adamantine"
     },
-    "Rock":{
+    "Rock": {
         price: 6.5,
-        src: null,
+        src: "Rock.png",
         name: "Rock"
     },
-    "IronBar":{
+    "IronBar": {
         price: 35,
-        src: null,
+        src: "IronBar.png",
         name: "Iron Bar"
     },
-    "GoldBar":{
+    "GoldBar": {
         price: 150,
-        src: null,
+        src: "GoldBar.png",
         name: "Gold Bar"
     },
-    "GoldenWatch":{
+    "GoldenWatch": {
         price: 2500,
-        src: null,
+        src: "GoldenWatch.png",
         name: "Golden Watch"
     }
 }
@@ -115,6 +120,30 @@ const buildings = [
         desc: `A basic Stone Mine. Stone collected from here is worth $${getabbv(itemdata["Stone"].price)}.`,
         time: 1,
         type: "mine"
+    },
+    {
+        name: "Basic Crafter",
+        id: "BasicCrafter",
+        baseprice: 75,
+        basedmg: 0,
+        basehealth: 750,
+        desc: "A basic and simple Crafter. Can't make much, but it works.",
+        type: "crafter",
+        recipes: {
+            "Rock": {
+                "Stone": 5
+            },
+            "IronBar": {
+                "Iron": 5
+            },
+            "GoldBar": {
+                "Gold": 5
+            },
+            "GoldenWatch": {
+                "GoldBar": 10,
+                "IronBar": 25
+            }
+        }
     },
     {
         name: "Iron Mine",
@@ -185,30 +214,6 @@ const buildings = [
         desc: `A hi-tech Adamantine Mine. Adamantine collected from here is worth $${getabbv(itemdata["Adamantine"].price)}`,
         time: 2.5,
         type: "mine"
-    },
-    {
-        name: "Basic Crafter",
-        id: "BasicCrafter",
-        baseprice: 75,
-        basedmg: 0,
-        basehealth: 750,
-        desc: "A basic and simple Crafter. Can't make much, but it works.",
-        type: "crafter",
-        recipes: {
-            "Rock":{
-                "Stone":5
-            },
-            "IronBar":{
-                "Iron":5
-            },
-            "GoldBar":{
-                "Gold":5
-            },
-            "GoldenWatch":{
-                "GoldBar":10,
-                "IronBar":25
-            }
-        }
     },
     {
         name: "Advanced Crafter",
@@ -450,6 +455,38 @@ buildings.forEach((v, i) => {
 })
 let selectedbuilding = null
 let inspectingbuilding = false
+function updinv() {
+    document.querySelector("#inv").innerHTML = ""
+    document.querySelector("#recipes").innerHTML = ""
+    if (selectedtab == 0) {
+        for (let key in ng.bdata[inspectidx].i) {
+            let c = document.createElement("span")
+            c.classList.add("invitem")
+            c.innerHTML = `
+            <img src="img/${itemdata[key].src}" class="invimg">
+            <p class="invp">${itemdata[key].name} - ${ng.bdata[inspectidx].i[key]}</p>`
+            document.querySelector("#inv").appendChild(c)
+        }
+    } else if (selectedtab == 1) {
+        const r = buildings.find(item => (item.id == ng.bdata[inspectidx].id))
+        function gettext (obj) {
+            let txt = ""
+            for (let k in obj) {
+                txt += `${getabbv(obj[k])}x ${itemdata[k].name}, `
+            }
+            txt = txt.slice(0,txt.length-2)
+            return txt
+        }
+        for (let key in r.recipes) {
+            let c = document.createElement("span")
+            c.classList.add("recitem")
+            c.innerHTML = `<img src="img/${key}.png" class="recimg">
+            <p class="recp">${gettext(r.recipes[key])}</p>
+            <button class="recselect"></button>`
+            document.querySelector("#recipes").appendChild(c)
+        }
+    }
+}
 function beginbuilding(b) {
     if (building || inspectingbuilding) { return }
     const index = buildings.findIndex(item => item.id == b)
@@ -540,13 +577,7 @@ document.addEventListener("click", (e) => {
     inspectingbuilding = true
     selectedtab = 0
     inspectidx = idx
-    document.querySelector("#inv").innerHTML = ""
-    for (let key in ng.bdata[inspectidx].i) {
-        let c = document.createElement("span")
-        c.classList.add("invitem")
-        c.innerHTML = `<img src="img/${itemdata[key].src}" class="invimg"><p class="invp">${itemdata[key].name} - ${ng.bdata[inspectidx].i[key]}</p>`
-        document.querySelector("#inv").appendChild(c)
-    }
+    updinv()
     document.querySelector("#uslider").value = ng.bdata[inspectidx].s
     const z = (buildings[buildings.findIndex(item => (ng.bdata[inspectidx].id == item.id))].type == "base" ? "none" : "block")
     document.querySelector("#uslider").style.display = z
@@ -619,6 +650,7 @@ document.querySelector("#uslider").addEventListener("input", (e) => {
 document.querySelectorAll(".invbutton").forEach((v, i) => {
     v.addEventListener("click", () => {
         selectedtab = i
+        updinv()
     })
 })
 function render() {
@@ -699,7 +731,7 @@ function render() {
                     } else {
                         d = true
                     }
-                    if (d) {
+                    if (d && buildings.find(item => (v.id == item.id)).type == "mine") {
                         newtruck(ng.bdata[0], v, v.id.split("Mine")[0], 1)
                     }
                 }
@@ -708,7 +740,6 @@ function render() {
         })
         truckdata.forEach((v) => {
             let d = ""
-            const dir = (v.tx > v.x ? 90 : -90) - Math.atan((v.ty - v.y) / (v.tx - v.x))
             if (v.tx > v.x) {
                 d = "r"
                 v.x += Math.min(1 / fps, v.tx - v.x)
@@ -736,14 +767,8 @@ function render() {
                     }
                 }
                 truckdata.splice(i, 1)
-                if (inspectingbuilding && selectedtab == 0) {
-                    document.querySelector("#inv").innerHTML = ""
-                    for (let key in ng.bdata[inspectidx].i) {
-                        let c = document.createElement("span")
-                        c.classList.add("invitem")
-                        c.innerHTML = `<img src="img/${itemdata[key].src}" class="invimg"><p class="invp">${itemdata[key].name} - ${ng.bdata[inspectidx].i[key]}</p>`
-                        document.querySelector("#inv").appendChild(c)
-                    }
+                if (inspectingbuilding) {
+                    updinv()
                 }
             }
         })
@@ -797,6 +822,15 @@ function render() {
     document.querySelectorAll(".invitem").forEach((v, i) => {
         v.style.top = `${14 * i + 2}vmin`
     })
+    document.querySelectorAll(".recitem").forEach((v, i) => {
+        v.style.top = `${14 * i + 2}vmin`
+        const z = v.querySelector(".recselect")
+        if (z.classList.contains("locked")) {
+            z.innerHTML = "Selected"
+        } else {
+            z.innerHTML = "Select"
+        }
+    })
     if (inspectingbuilding) {
         document.querySelectorAll(".invbutton").forEach((v, i) => {
             if (i == selectedtab) {
@@ -815,7 +849,7 @@ function render() {
         if (selectedtab == 0) {
             document.querySelector("#inv").style.display = "block"
             document.querySelector("#recipes").style.display = "none"
-        } else if (selectedtab == 2) {
+        } else if (selectedtab == 1) {
             document.querySelector("#inv").style.display = "none"
             document.querySelector("#recipes").style.display = "block"
         }
